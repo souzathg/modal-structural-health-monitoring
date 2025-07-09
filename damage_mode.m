@@ -24,14 +24,18 @@ C2 = [C21 C22];
 
 D = [0 0];
 
-sys = ss(A, B, C2, D);
+B_col1 = B(:, 1);
+B1_col1 = B1(:,1);
+B2_col1 = B2(:,1);
 
-sys1 = ss(A1,B1, C21, 0);
-sys2 = ss(A2, B2, C22, 0);
+sys_col1 = ss(A, B_col1, C2, 0);
+sys1_col1 = ss(A1, B1_col1, C21, 0);
+sys2_col1 = ss(A2, B2_col1, C22, 0);
 
+% Gerar o gráfico
 figure
-bodemag(sys, 'k', ...
-    sys1, 'b--', ...
-    sys2, 'r--')
-legend ('Sistema','Modo 1', 'Modo 2')
-grid minor
+h = bodeplot(sys_col1, 'k', ...
+             sys1_col1, 'b:', ...
+             sys2_col1, 'r:');
+
+legend('Sistema', 'Modo 1','Modo 2','Location','best')
