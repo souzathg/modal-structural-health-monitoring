@@ -15,6 +15,8 @@ b  = 7.5;
 % Empacotando em struct para passar fácil para a simulação
 Nominal.A = A; Nominal.B = B; Nominal.C = C; Nominal.D = D;
 
+[NominalModal, T] = convert_to_modal(Nominal);
+
 %% 2. Geração do Sinal Chirp
 Fs = 1e3; 
 Tchirp = 20; 
@@ -23,39 +25,50 @@ Tchirp = 20;
 % Plotagem de verificação (opcional)
 figure; plot(t, w_in); title('Sinal de Entrada - Chirp'); grid on; axis tight;
 
-%% 3. Projeto do Observador (Luenberger)
-polos_sys = eig(A);
-fator_rapidez = 3;
-polos_obs = real(polos_sys)*fator_rapidez + 1i*imag(polos_sys) - 0.5;
+%% 3.1 Projeto do Observador de Luenberger
+fprintf('\n=== PROJETO LUENBERGER ===\n');
+fator_rapidez = 2; 
+[L_luenberger, polos_obs_luen] = design_luenberger(Nominal, fator_rapidez);
 
-% Ackermann para calcular L
-L = place(A', C', polos_obs)';
-fprintf('Ganho L calculado. Polos em: %.2f +/- %.2fi\n', ...
-    mean(real(polos_obs)), mean(abs(imag(polos_obs))));
+%% 3.2 Projeto do Filtro de Kalman (NOVO)
+fprintf('\n=== PROJETO KALMAN ===\n');
+% Parâmetros do texto (Seção 4.6.2 e 4.4)
+q_val = 1e-7;       
+target_SNR = 30;    
 
-%% 4. Simulação: Cenário 1 (Dano Amortecedor)
-fprintf('Simulando Dano no Amortecedor...\n');
-[Ad, Bd, Cd, Dd] = generate_model(m1, m2, k1, k2, b * 0.5); % b reduzido
+[L_kalman, Q_kalman, R_kalman] = design_kalman(Nominal, t, w_in, q_val, target_SNR);
+
+%% 4. Simulação Comparativa: Cenário 1 (Dano Amortecedor)
+fprintf('\n--- Simulando Dano no Amortecedor ---\n');
+[Ad, Bd, Cd, Dd] = generate_model(m1, m2, k1, k2, b * 0.5); 
 Dano1.A = Ad; Dano1.B = Bd; Dano1.C = Cd; Dano1.D = Dd;
 
-res_dano1 = run_observer_sim(Nominal, Dano1, L, t, w_in, Tchirp);
+% Simulação com Luenberger
+fprintf('Rodando Luenberger...\n');
+[res_luen_d1, ~] = run_observer_sim_noisy(Nominal, Dano1, L_luenberger, t, w_in, Tchirp);
 
-%% 5. Simulação: Cenário 2 (Dano Mola)
-fprintf('Simulando Dano na Mola...\n');
-[Ad2, Bd2, Cd2, Dd2] = generate_model(m1, m2, k1, k2 * 0.5, b); % k2 reduzido
+% Simulação com Kalman
+fprintf('Rodando Kalman...\n');
+[res_kalman_d1, ~] = run_observer_sim_noisy(Nominal, Dano1, L_kalman, t, w_in, Tchirp);
+
+%% 5. Simulação Comparativa: Cenário 2 (Dano Mola)
+fprintf('\n--- Simulando Dano na Mola ---\n');
+[Ad2, Bd2, Cd2, Dd2] = generate_model(m1, m2, k1, k2 * 0.5, b); 
 Dano2.A = Ad2; Dano2.B = Bd2; Dano2.C = Cd2; Dano2.D = Dd2;
 
-res_dano2 = run_observer_sim(Nominal, Dano2, L, t, w_in, Tchirp);
+% Simulação com Luenberger
+[res_luen_d2, ~] = run_observer_sim_noisy(Nominal, Dano2, L_luenberger, t, w_in, Tchirp);
 
-%% 6. Análise Modal dos Resultados
-% Identifica frequências naturais para os filtros
-freqs_rad = sort(abs(imag(eig(A))));
-freqs_hz = freqs_rad(freqs_rad > 0.1) / (2*pi); % Remove os 0s e converte
-freqs_principais = [freqs_hz(1), freqs_hz(3)]; % Pega os 2 modos positivos
+% Simulação com Kalman
+[res_kalman_d2, ~] = run_observer_sim_noisy(Nominal, Dano2, L_kalman, t, w_in, Tchirp);
 
-% Chama a função de plotagem externa
-plot_modal_signature(res_dano1, t, Tchirp, freqs_principais, Fs, ...
-    'Assinatura: Dano no Amortecedor');
+%% 6. Análise Modal e Comparação
+% Aqui você pode plotar os dois para comparar a imunidade ao ruído
 
-plot_modal_signature(res_dano2, t, Tchirp, freqs_principais, Fs, ...
-    'Assinatura: Dano na Mola');
+% Plotagem Dano 1 (Comparação)
+plot_modal_signature(res_luen_d1, t, Tchirp, Fs, 'Luenberger: Dano Amortecedor');
+plot_modal_signature(res_kalman_d1, t, Tchirp, Fs, 'Kalman: Dano Amortecedor');
+
+% Plotagem Dano 2 (Comparação)
+plot_modal_signature(res_luen_d2, t, Tchirp, Fs, 'Luenberger: Dano Mola');
+plot_modal_signature(res_kalman_d2, t, Tchirp, Fs, 'Kalman: Dano Mola');
