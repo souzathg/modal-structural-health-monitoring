@@ -1,4 +1,4 @@
-%% TCC - Análise de Sensibilidade Paramétrica (Diagrama de Bode)
+%% Análise de Sensibilidade Paramétrica (Diagrama de Bode)
 % Descrição: Este script gera diagramas de Bode (apenas Magnitude) variando
 % os parâmetros de amortecimento (b) e rigidez da suspensão (k2) de
 % 0% a 100% do valor nominal.
@@ -29,17 +29,16 @@ f_hz = w_freq / (2*pi);
 % Mapa de cores para o gradiente ( Azul -> Vermelho )
 colors = jet(num_vars);
 
-%% 2. Criação da Figura
-figure('Name', 'Análise de Sensibilidade - Bode', 'Color', 'w', 'Position', [100, 100, 800, 800]);
 
-%% --- SUBPLOT 1: Variação do Amortecimento (b) ---
-subplot(2,1,1); hold on;
-title('Sensibilidade ao Amortecimento (b) - variando k_2 fixo', 'FontSize', 12);
+%% --- FIGURA 1: Variação do Amortecimento (b) ---
+figure('Name', 'Sensibilidade - Amortecimento (b)', 'Color', 'w');
+hold on;
+
+title('Resposta à variação do Amortecimento (b)', 'FontSize', 12, 'FontWeight','bold');
+subtitle('(b) variando — (k_2) fixo', 'FontSize', 10)
 ylabel('Magnitude (dB)', 'FontSize', 11);
 xlabel('Frequência (Hz)', 'FontSize', 11);
 grid minor; box on;
-
-legend_entries_b = cell(num_vars, 1);
 
 for i = 1:num_vars
     pct = porcentagens(i);
@@ -57,28 +56,23 @@ for i = 1:num_vars
     mag_db = 20*log10(squeeze(mag));
     
     % Plotagem com cor do gradiente
-    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 1.5);
-    
-    % Texto para a legenda
-    legend_entries_b{i} = sprintf('b = %d%% (%.1f Ns/m)', round(pct*100), b_atual);
+    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 0.7);
 end
 % Ajusta eixos
-xlim([0.1 20]); ylim([-50 60]);
-% Adiciona legenda (apenas algumas para não poluir, ou todas se preferir)
-idx_leg = [1, 3, 6, 9, 11]; % Índices para 0%, 20%, 50%, 80%, 100%
-% legend(legend_entries_b(idx_leg), 'Location', 'southwest', 'FontSize', 9);
-colormap(gca, jet); c = colorbar; c.Label.String = 'Variação do valor nominal';
+xlim([0.1 12]); ylim([-50 60]);
+colormap(gca, jet); c = colorbar; c.Label.String = 'Porcentagem do valor nominal';
 
 
-%% --- SUBPLOT 2: Variação da Rigidez (k2) ---
-subplot(2,1,2); hold on;
-title('Sensibilidade à Rigidez da Suspensão (k_2) - b fixo', 'FontSize', 12);
+%% --- FIGURA 2: Variação da Rigidez (k2) ---
+figure('Name', 'Sensibilidade - Rigidez (k2)', 'Color', 'w');
+hold on;
+
+title('Resposta à variação da Rigidez da Suspensão (k_2)', 'FontSize', 12);
+subtitle('(b) fixo — (k_2) variando', 'FontSize', 10)
 ylabel('Magnitude (dB)', 'FontSize', 11);
 xlabel('Frequência (Hz)', 'FontSize', 11);
 
 grid minor; box on;
-
-legend_entries_k = cell(num_vars, 1);
 
 for i = 1:num_vars
     pct = porcentagens(i);
@@ -95,13 +89,10 @@ for i = 1:num_vars
     mag_db = 20*log10(squeeze(mag));
     
     % Plotagem
-    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 1.5);
-    
-    legend_entries_k{i} = sprintf('k2 = %d%% (%.0f N/m)', round(pct*100), k2_atual);
+    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 0.7);
 end
-xlim([0.1 20]); ylim([-50 30]);
-%legend(legend_entries_k(idx_leg), 'Location', 'southwest', 'FontSize', 9);
-colormap(gca, jet); c = colorbar; c.Label.String = 'Variação do valor nominal';
+xlim([0.1 12]); ylim([-50 30]);
+colormap(gca, jet); c = colorbar; c.Label.String = 'Porcentagem do valor nominal';
 
 
 %% Função Auxiliar para Montar o Sistema
