@@ -30,7 +30,7 @@ fprintf('\n=== PROJETO LUENBERGER ===\n');
 fator_rapidez = 3; 
 [L_luenberger, polos_obs_luen] = design_luenberger(Nominal, fator_rapidez);
 
-%% 3.2 Projeto do Filtro de Kalman (NOVO)
+%% 3.2 Projeto do Filtro de Kalman
 fprintf('\n=== PROJETO KALMAN ===\n');
 % Parâmetros do texto (Seção 4.6.2 e 4.4)
 q_val = 1e-7;       
@@ -76,14 +76,14 @@ Dano3.A = Ad3; Dano3.B = Bd3; Dano3.C = Cd3; Dano3.D = Dd3;
 %% 7. Análise Modal e Comparação
 % Aqui você pode plotar os dois para comparar a imunidade ao ruído
 
-% Plotagem Dano 1 (Comparação)
-plot_modal_signature(res_luen_d1, t, Tchirp, Fs, 'Luenberger: Dano Amortecedor');
-plot_modal_signature(res_kalman_d1, t, Tchirp, Fs, 'Kalman: Dano Amortecedor');
+% Comparação Dano 1 (Amortecedor)
+plot_modal_signature(res_luen_d1, res_kalman_d1, t, Tchirp, Fs, ...
+    'Dano no Amortecedor (b = 50%)');
 
-% Plotagem Dano 2 (Comparação)
-plot_modal_signature(res_luen_d2, t, Tchirp, Fs, 'Luenberger: Dano Mola');
-plot_modal_signature(res_kalman_d2, t, Tchirp, Fs, 'Kalman: Dano Mola');
+% Comparação Dano 2 (Mola)
+plot_modal_signature(res_luen_d2, res_kalman_d2, t, Tchirp, Fs, ...
+    'Dano na Rigidez (k_2 = 50%)');
 
-% Plotagem Dano 3 (Comparação)
-plot_modal_signature(res_luen_d3, t, Tchirp, Fs, 'Luenberger: Dano Misto');
-plot_modal_signature(res_kalman_d3, t, Tchirp, Fs, 'Kalman: Dano Misto');
+% Comparação Dano 3 (Misto)
+plot_modal_signature(res_luen_d3, res_kalman_d3, t, Tchirp, Fs, ...
+    'Dano Misto (b=50%, k_2=50%)');
