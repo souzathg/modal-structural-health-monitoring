@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.2.7">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.3">
   <diagram name="Page-1" id="OrSkdqRF8jsn6nHUV8IH">
-    <mxGraphModel dx="951" dy="575" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
+    <mxGraphModel dx="679" dy="377" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -12,13 +12,13 @@
             <mxPoint x="180.1111111111111" y="200" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \mathbf{B} $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \mathbf{B} $$" vertex="1">
           <mxGeometry height="40" width="40" x="160" y="240" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-14" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-13">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-4" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \int $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-4" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \int $$" vertex="1">
           <mxGeometry height="40" width="40" x="360" y="240" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-9" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-4">
@@ -36,7 +36,7 @@
         <mxCell id="hawk60vy4LtrKi5_sDWZ-32" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-31">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-13" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \mathbf{C} $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-13" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \mathbf{C} $$" vertex="1">
           <mxGeometry height="40" width="40" x="480" y="239" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap; background-color: rgb(255, 255, 255);&quot;&gt;$$ \hat{\mathbf{x}}(t) $$&lt;/span&gt;" vertex="1">
@@ -53,13 +53,13 @@
             <mxPoint x="440" y="260" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-16" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \mathbf{A} $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-16" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \mathbf{A} $$" vertex="1">
           <mxGeometry height="40" width="40" x="360" y="300" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-20" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-18">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-17" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \mathbf{K_e} $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-17" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \mathbf{K_e} $$" vertex="1">
           <mxGeometry height="40" width="40" x="360" y="360" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-23" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-6">
@@ -85,7 +85,7 @@
         <mxCell id="hawk60vy4LtrKi5_sDWZ-35" edge="1" parent="1" source="hawk60vy4LtrKi5_sDWZ-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="hawk60vy4LtrKi5_sDWZ-31">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hawk60vy4LtrKi5_sDWZ-27" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="$$ \mathbf{D} $$" vertex="1">
+        <mxCell id="hawk60vy4LtrKi5_sDWZ-27" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="$$ \mathbf{D} $$" vertex="1">
           <mxGeometry height="40" width="40" x="360" y="180" as="geometry" />
         </mxCell>
         <mxCell id="hawk60vy4LtrKi5_sDWZ-29" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 11px; text-wrap-mode: nowrap; background-color: rgb(255, 255, 255);&quot;&gt;$$ \mathbf{w}(t) $$&lt;/span&gt;" vertex="1">
