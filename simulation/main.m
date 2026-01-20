@@ -1,89 +1,102 @@
-%% TCC - ANÁLISE DE FALHAS (MODULARIZADO)
+%% TCC - ANÁLISE DE FALHAS (COMPLETO - 2 SAÍDAS)
 % Autor: Thiago Tioma
-% Descrição: Script principal para simulação e diagnóstico de falhas.
+% Descrição: Simulação de 3 cenários de falha com análise MIMO (x1 e x2).
 
 clc; clear; close all;
 
 %% 1. Configuração e Modelo Nominal
-m1 = 1; m2 = 1.45;
-k1 = 1250; k2 = 900;
-b  = 7.5;
+m1 = 1;         % Massa não suspensa [kg]
+m2 = 2.45;      % Massa suspensa [kg]
+k1 = 1250;      % Rigidez do pneu [N/m]
+k2_nom = 900;   % Rigidez da suspensão [N/m]
+b_nom  = 7.5;   % Amortecimento [Ns/m]
 
-% Obtendo matrizes nominais usando a função externa
-[A, B, C, D] = generate_model(m1, m2, k1, k2, b);
+% Gera o modelo original
+[A, B, C, D] = generate_model(m1, m2, k1, k2_nom, b_nom);
 
-% Empacotando em struct para passar fácil para a simulação
 Nominal.A = A; Nominal.B = B; Nominal.C = C; Nominal.D = D;
 
-[NominalModal, T] = convert_to_modal(Nominal);
+% Checagem de observabilidade
+fprintf('\n=== VERIFICAÇÃO DE OBSERVABILIDADE ===\n');
+verify_observability_condition(A, C)
+
 
 %% 2. Geração do Sinal Chirp
 Fs = 1e3; 
 Tchirp = 20; 
 [w_in, t] = generate_chirp(Fs, Tchirp, 0.04, 0, 12);
 
-% Plotagem de verificação (opcional)
-% figure; plot(t, w_in); title('Sinal de Entrada - Chirp'); grid on; axis tight;
+%% 3. Projeto dos Observadores (MIMO)
 
-%% 3.1 Projeto do Observador de Luenberger
-fprintf('\n=== PROJETO LUENBERGER ===\n');
-fator_rapidez = 3; 
-[L_luenberger, polos_obs_luen] = design_luenberger(Nominal, fator_rapidez);
+% --- Luenberger ---
+fprintf('\n=== PROJETO LUENBERGER (MIMO) ===\n');
+fator_rapidez = 3;
+polos_planta = eig(A);
+% Garante que os polos sejam complexos conjugados estáveis
+polos_desejados = real(polos_planta) * fator_rapidez + 1i * imag(polos_planta);
+L_luenberger = place(A', C', polos_desejados)'; 
 
-%% 3.2 Projeto do Filtro de Kalman
-fprintf('\n=== PROJETO KALMAN ===\n');
-% Parâmetros do texto (Seção 4.6.2 e 4.4)
-q_val = 1e-7;       
-target_SNR = 30;    
+% --- Kalman ---
+fprintf('\n=== PROJETO KALMAN (MIMO) ===\n');
+q_proj = 1e-7; 
+Q_kalman = q_proj * eye(4); 
+% R deve ser 2x2 (uma estimativa de ruído para cada sensor)
+R_kalman = 1e-4 * eye(2); 
+L_kalman = lqe(A, eye(4), C, Q_kalman, R_kalman);
 
-[L_kalman, Q_kalman, R_kalman] = design_kalman(Nominal, t, w_in, q_val, target_SNR);
+%% ---------------------------------------------------------
+%% CENÁRIO 1: Falha no Amortecedor (b = 50%)
+%% ---------------------------------------------------------
+fprintf('\n--- Simulando Cenário 1: Amortecedor ---\n');
 
-%% 4. Simulação Comparativa: Cenário 1 (Dano no Amortecedor)
-fprintf('\n--- Simulando Dano no Amortecedor ---\n');
-[Ad, Bd, Cd, Dd] = generate_model(m1, m2, k1, k2, b * 0.5); 
-Dano1.A = Ad; Dano1.B = Bd; Dano1.C = Cd; Dano1.D = Dd;
+% Gera modelo com falha (b reduzido)
+[Ad1, Bd1, ~, ~] = generate_model(m1, m2, k1, k2_nom, b_nom * 0.5);
 
-% Simulação com Luenberger
-fprintf('Rodando Luenberger...\n');
+% Empacota (Mantendo C e D de 2 saídas)
+Dano1.A = Ad1; Dano1.B = Bd1; Dano1.C = C; Dano1.D = D;
+
+% Simulações
 [res_luen_d1, ~] = run_observer_sim_noisy(Nominal, Dano1, L_luenberger, t, w_in, Tchirp);
-
-% Simulação com Kalman
-fprintf('Rodando Kalman...\n');
 [res_kalman_d1, ~] = run_observer_sim_noisy(Nominal, Dano1, L_kalman, t, w_in, Tchirp);
 
-%% 5. Simulação Comparativa: Cenário 2 (Dano na Mola)
-fprintf('\n--- Simulando Dano na Mola ---\n');
-[Ad2, Bd2, Cd2, Dd2] = generate_model(m1, m2, k1, k2 * 0.5, b); 
-Dano2.A = Ad2; Dano2.B = Bd2; Dano2.C = Cd2; Dano2.D = Dd2;
+% Plotagem
+plot_modal_signature(res_luen_d1, res_kalman_d1, t, Tchirp, Fs, ...
+    'Cenário 1: Falha no Amortecedor (b=50%)');
 
-% Simulação com Luenberger
+%% ---------------------------------------------------------
+%% CENÁRIO 2: Falha na Rigidez (k2 = 50%)
+%% ---------------------------------------------------------
+fprintf('\n--- Simulando Cenário 2: Mola ---\n');
+
+% Gera modelo com falha (k2 reduzido)
+[Ad2, Bd2, ~, ~] = generate_model(m1, m2, k1, k2_nom * 0.5, b_nom);
+
+% Empacota
+Dano2.A = Ad2; Dano2.B = Bd2; Dano2.C = C; Dano2.D = D;
+
+% Simulações
 [res_luen_d2, ~] = run_observer_sim_noisy(Nominal, Dano2, L_luenberger, t, w_in, Tchirp);
-
-% Simulação com Kalman
 [res_kalman_d2, ~] = run_observer_sim_noisy(Nominal, Dano2, L_kalman, t, w_in, Tchirp);
 
-%% 6. Simulação Comparativa: Cenário 3 (Dano no Amortecedor e na Mola)
-fprintf('\n--- Simulando Dano no Amortecedor e na Mola ---\n');
-[Ad3, Bd3, Cd3, Dd3] = generate_model(m1, m2, k1, k2 * 0.5, b * 0.5);
-Dano3.A = Ad3; Dano3.B = Bd3; Dano3.C = Cd3; Dano3.D = Dd3;
+% Plotagem
+plot_modal_signature(res_luen_d2, res_kalman_d2, t, Tchirp, Fs, ...
+    'Cenário 2: Falha na Rigidez (k_2=50%)');
 
-% Simulação com Luenberger
+%% ---------------------------------------------------------
+%% CENÁRIO 3: Falha Mista (b=50%, k2=50%)
+%% ---------------------------------------------------------
+fprintf('\n--- Simulando Cenário 3: Misto ---\n');
+
+% Gera modelo com falha dupla
+[Ad3, Bd3, ~, ~] = generate_model(m1, m2, k1, k2_nom * 0.5, b_nom * 0.5);
+
+% Empacota
+Dano3.A = Ad3; Dano3.B = Bd3; Dano3.C = C; Dano3.D = D;
+
+% Simulações
 [res_luen_d3, ~] = run_observer_sim_noisy(Nominal, Dano3, L_luenberger, t, w_in, Tchirp);
-
-% Simulação com Kalman
 [res_kalman_d3, ~] = run_observer_sim_noisy(Nominal, Dano3, L_kalman, t, w_in, Tchirp);
 
-%% 7. Análise Modal e Comparação
-% Aqui você pode plotar os dois para comparar a imunidade ao ruído
-
-% Comparação Dano 1 (Amortecedor)
-plot_modal_signature(res_luen_d1, res_kalman_d1, t, Tchirp, Fs, ...
-    'Dano no Amortecedor (b = 50%)');
-
-% Comparação Dano 2 (Mola)
-plot_modal_signature(res_luen_d2, res_kalman_d2, t, Tchirp, Fs, ...
-    'Dano na Rigidez (k_2 = 50%)');
-
-% Comparação Dano 3 (Misto)
+% Plotagem
 plot_modal_signature(res_luen_d3, res_kalman_d3, t, Tchirp, Fs, ...
-    'Dano Misto (b=50%, k_2=50%)');
+    'Cenário 3: Falha Mista (b=50%, k_2=50%)');
