@@ -8,7 +8,7 @@ clear; clc; close all;
 
 %% 1. Parâmetros Nominais do Sistema
 m1 = 1;         % Massa não suspensa [kg]
-m2 = 1.45;      % Massa suspensa [kg]
+m2 = 2.45;      % Massa suspensa [kg]
 k1 = 1250;      % Rigidez do pneu [N/m] (Fixo)
 k2_nom = 900;   % Rigidez NOMINAL da suspensão [N/m]
 b_nom  = 7.5;   % Amortecimento NOMINAL [Ns/m]
@@ -19,90 +19,110 @@ porcentagens = [1e-6, 0.1:0.1:1.0];
 num_vars = length(porcentagens);
 
 % Definição da Saída para o Bode (Posição da Massa Suspensa y)
-C_out = [0, 1, 0, 0];
-D_out = 0;
+C_out = [1, 0, 0, 0;
+         0, 1, 0, 0];
+D_out = [0; 0];
 
-% Vetor de frequências para o plot (0.1 Hz a 20 Hz)
-w_freq = logspace(log10(0.1*2*pi), log10(20*2*pi), 500);
+% Vetor de frequências (0.1 a 12 Hz conforme seu chirp)
+w_freq = linspace(0.1, 12, 500) * 2 * pi; 
 f_hz = w_freq / (2*pi);
 
-% Mapa de cores para o gradiente ( Azul -> Vermelho )
-colors = jet(num_vars);
-
-
 %% --- FIGURA 1: Variação do Amortecimento (b) ---
-figure('Name', 'Sensibilidade - Amortecimento (b)', 'Color', 'w');
-hold on;
+figure('Name', 'Sensibilidade - Amortecimento (b)', 'Color', 'w', 'Position', [100, 100, 1000, 800]);
 
-title('Resposta à variação do Amortecimento (b)', 'FontSize', 12, 'FontWeight','bold');
-subtitle('(b) variando — (k_2) fixo', 'FontSize', 10)
-ylabel('Magnitude (dB)', 'FontSize', 11);
-xlabel('Frequência (Hz)', 'FontSize', 11);
-grid minor; box on;
+sgtitle('Resposta à variação do coef. de amortecimento (b)')
+
+% Prepara os eixos
+ax1 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)');
+ax2 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
+
+% Cores para o gradiente
+cores = jet(num_vars);
 
 for i = 1:num_vars
     pct = porcentagens(i);
     
     % Parâmetros atuais
     b_atual = b_nom * pct;
-    k2_atual = k2_nom; % k2 fixo no nominal
+    k2_atual = k2_nom;     % k2 fixo no nominal
     
     % Monta o sistema
     sys_curr = get_sys_ss(m1, m2, k1, k2_atual, b_atual, C_out, D_out);
     
-    % Calcula a resposta em frequência (Magnitude apenas)
-    % squeeze remove dimensões unitárias de matrizes 3D
+    % Calcula a resposta em frequência (MIMO: 2 saídas, 1 entrada)
     [mag, ~] = bode(sys_curr, w_freq);
-    mag_db = 20*log10(squeeze(mag));
     
-    % Plotagem com cor do gradiente
-    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 0.7);
+    % --- ALTERAÇÃO 2: EXTRAÇÃO DOS DADOS ---
+    % mag tem dimensões [Saídas x Entradas x Frequencias] -> [2 x 1 x 500]
+    
+    % Saída 1 (x1)
+    mag_x1 = squeeze(mag(1, 1, :));
+    mag_db_x1 = 20*log10(mag_x1);
+    
+    % Saída 2 (x2)
+    mag_x2 = squeeze(mag(2, 1, :));
+    mag_db_x2 = 20*log10(mag_x2);
+    
+    % Plota nos subplots respectivos
+    plot(ax1, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1.2);
+    plot(ax2, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1.2);
 end
-% Ajusta eixos
-xlim([0.1 12]); ylim([-50 60]);
-colormap(gca, jet); c = colorbar; c.Label.String = 'Porcentagem do valor nominal';
+
+% Ajustes Finais Figura 1
+linkaxes([ax1, ax2], 'x'); xlim(ax1, [0.1 12]);
+colormap(ax1, jet); c = colorbar(ax1, 'Position', [0.925 0.35 0.015 0.35]); c.Label.String = '% do coef. de amortecimento da suspensão (b)';
+colormap(ax2, jet); % Apenas para manter consistência visual
 
 
 %% --- FIGURA 2: Variação da Rigidez (k2) ---
-figure('Name', 'Sensibilidade - Rigidez (k2)', 'Color', 'w');
-hold on;
+figure('Name', 'Sensibilidade - Rigidez (k2)', 'Color', 'w', 'Position', [150, 100, 1000, 800]);
 
-title('Resposta à variação da Rigidez da Suspensão (k_2)', 'FontSize', 12);
-subtitle('(b) fixo — (k_2) variando', 'FontSize', 10)
-ylabel('Magnitude (dB)', 'FontSize', 11);
-xlabel('Frequência (Hz)', 'FontSize', 11);
+sgtitle('Resposta à variação do coef. de rigidez (k_2)')
 
-grid minor; box on;
+% Prepara os eixos
+ax3 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)');
+ax4 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
 
 for i = 1:num_vars
     pct = porcentagens(i);
     
     % Parâmetros atuais
-    b_atual = b_nom;     % b fixo no nominal
+    b_atual = b_nom;      % b fixo no nominal
     k2_atual = k2_nom * pct;
     
     % Monta o sistema
     sys_curr = get_sys_ss(m1, m2, k1, k2_atual, b_atual, C_out, D_out);
     
-    % Calcula a resposta em frequência
+    % Calcula Bode
     [mag, ~] = bode(sys_curr, w_freq);
-    mag_db = 20*log10(squeeze(mag));
     
-    % Plotagem
-    semilogx(f_hz, mag_db, 'Color', colors(i,:), 'LineWidth', 0.7);
+    % Extrai e Converte para dB
+    mag_db_x1 = 20*log10(squeeze(mag(1, 1, :)));
+    mag_db_x2 = 20*log10(squeeze(mag(2, 1, :)));
+    
+    % Plota
+    plot(ax3, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1.2);
+    plot(ax4, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1.2);
 end
-xlim([0.1 12]); ylim([-50 30]);
-colormap(gca, jet); c = colorbar; c.Label.String = 'Porcentagem do valor nominal';
+
+% Ajustes Finais Figura 2
+linkaxes([ax3, ax4], 'x'); xlim(ax3, [0.1 12]);
+colormap(ax3, jet); c = colorbar(ax3, 'Position', [0.925 0.35 0.015 0.35]); c.Label.String = '% do coef. de rigidez da suspensão (k_2)';
+colormap(ax4, jet);
 
 
-%% Função Auxiliar para Montar o Sistema
-function sys = get_sys_ss(m1, m2, k1, k2_val, b_val, C_out, D_out)
-    n = 2;
-    A = [zeros(n), eye(n); ...
-         [-(k1 + k2_val)/m1, k2_val/m1; k2_val/m2, -k2_val/m2], ...
-         [-b_val/m1, b_val/m1; b_val/m2, -b_val/m2]];
-    % B (Entrada de perturbação w)
-    B = [0; 0; k1/m1; 0];
+%% --- FUNÇÃO LOCAL PARA GERAR O SISTEMA ---
+function sys = get_sys_ss(m1, m2, k1, k2, b, C, D)
+    % Gera as matrizes A e B locais
+    % (Copiado da lógica do seu generate_model, mas simplificado para o script)
     
-    sys = ss(A, B, C_out, D_out);
+    A = [0, 1, 0, -1;
+        -k2/m2, -b/m2, 0, b/m2;
+        0, 0, 0, 1;
+        k2/m1, b/m1, -k1/m1, -b/m1]; % Com a correção da vírgula
+        
+    B = [0; 0; -1; 1/m1];
+    
+    % Cria objeto State-Space
+    sys = ss(A, B, C, D);
 end
