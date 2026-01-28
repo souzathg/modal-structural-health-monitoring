@@ -1,6 +1,6 @@
-%% TCC - ANÁLISE DE FALHAS (COMPLETO - 2 SAÍDAS)
+%% TCC - ANÁLISE DE DANOS (COMPLETO - 2 SAÍDAS)
 % Autor: Thiago Tioma
-% Descrição: Simulação de 3 cenários de falha com análise MIMO (x1 e x2).
+% Descrição: Simulação de 3 cenários de dano com análise MIMO (y_1 e y_2).
 
 clc; clear; close all;
 
