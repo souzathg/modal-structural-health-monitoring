@@ -18,7 +18,7 @@ b_nom  = 7.5;   % Amortecimento NOMINAL [Ns/m]
 porcentagens = [1e-6, 0.1:0.1:1.0]; 
 num_vars = length(porcentagens);
 
-% Definição da Saída para o Bode (Posição da Massa Suspensa y)
+% Definição da Saída para o Bode (Posição das Massas)
 C_out = [1, 0, 0, 0;
          0, 1, 0, 0];
 D_out = [0; 0];
@@ -70,7 +70,7 @@ end
 
 % Ajustes Finais Figura 1
 linkaxes([ax1, ax2], 'x'); xlim(ax1, [0.1 12]);
-colormap(ax1, jet); c = colorbar(ax1, 'Position', [0.925 0.35 0.015 0.35]); c.Label.String = '% do coef. de amortecimento da suspensão (b)';
+colormap(ax1, jet); c = colorbar(ax1, 'Position', [0.925 0.33 0.015 0.35]); c.Label.String = '% do coef. de amortecimento da suspensão (b)';
 colormap(ax2, jet); % Apenas para manter consistência visual
 
 
@@ -107,7 +107,7 @@ end
 
 % Ajustes Finais Figura 2
 linkaxes([ax3, ax4], 'x'); xlim(ax3, [0.1 12]);
-colormap(ax3, jet); c = colorbar(ax3, 'Position', [0.925 0.35 0.015 0.35]); c.Label.String = '% do coef. de rigidez da suspensão (k_2)';
+colormap(ax3, jet); c = colorbar(ax3, 'Position', [0.925 0.33 0.015 0.35]); c.Label.String = '% do coef. de rigidez da suspensão (k_2)';
 colormap(ax4, jet);
 
 
