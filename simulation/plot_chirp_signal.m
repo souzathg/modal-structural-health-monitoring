@@ -1,5 +1,4 @@
 %% Visualização do Sinal de Entrada (Chirp) - 3 Figuras Separadas
-% Autor: Thiago Tioma
 % Descrição: Plota o sinal no tempo, o espectrograma e o zoom em janelas distintas.
 
 clc; clear; close all;

@@ -1,5 +1,4 @@
-%% TCC - ANÁLISE DE DANOS (COMPLETO - 2 SAÍDAS)
-% Autor: Thiago Tioma
+%% ANÁLISE DE DANOS (COMPLETO - 2 SAÍDAS)
 % Descrição: Simulação de 3 cenários de dano com análise MIMO (y_1 e y_2).
 
 clc; clear; close all;
@@ -19,7 +18,6 @@ Nominal.A = A; Nominal.B = B; Nominal.C = C; Nominal.D = D;
 % Checagem de observabilidade
 fprintf('\n=== VERIFICAÇÃO DE OBSERVABILIDADE ===\n');
 verify_observability_condition(A, C)
-
 
 %% 2. Geração do Sinal Chirp
 Fs = 1e3; 
@@ -45,7 +43,7 @@ R_kalman = 1e-4 * eye(2);
 L_kalman = lqe(A, eye(4), C, Q_kalman, R_kalman);
 
 %% ---------------------------------------------------------
-%% CENÁRIO 1: Falha no Amortecedor (b = 50%)
+%% CENÁRIO 1: Dano no Amortecedor (b = 50%)
 %% ---------------------------------------------------------
 fprintf('\n--- Simulando Cenário 1: Amortecedor ---\n');
 
@@ -61,12 +59,12 @@ Dano1.A = Ad1; Dano1.B = Bd1; Dano1.C = C; Dano1.D = D;
 
 % Plotagem
 plot_modal_signature(res_luen_d1, res_kalman_d1, t, Tchirp, Fs, ...
-    'Cenário 1: Falha no Amortecedor (b=50%)');
+    'Cenário 1: Dano no Amortecedor (b=50%)');
 
 %% ---------------------------------------------------------
-%% CENÁRIO 2: Falha na Rigidez (k2 = 50%)
+%% CENÁRIO 2: Dano na Rigidez (k_2 = 50%)
 %% ---------------------------------------------------------
-fprintf('\n--- Simulando Cenário 2: Mola ---\n');
+fprintf('\n--- Simulando Cenário 2: Rigidez ---\n');
 
 % Gera modelo com falha (k2 reduzido)
 [Ad2, Bd2, ~, ~] = generate_model(m1, m2, k1, k2_nom * 0.5, b_nom);
@@ -80,10 +78,10 @@ Dano2.A = Ad2; Dano2.B = Bd2; Dano2.C = C; Dano2.D = D;
 
 % Plotagem
 plot_modal_signature(res_luen_d2, res_kalman_d2, t, Tchirp, Fs, ...
-    'Cenário 2: Falha na Rigidez (k_2=50%)');
+    'Cenário 2: Dano na Rigidez (k_2=50%)');
 
 %% ---------------------------------------------------------
-%% CENÁRIO 3: Falha Mista (b=50%, k2=50%)
+%% CENÁRIO 3: Dano Misto (b=50%, k_2=50%)
 %% ---------------------------------------------------------
 fprintf('\n--- Simulando Cenário 3: Misto ---\n');
 
@@ -99,4 +97,4 @@ Dano3.A = Ad3; Dano3.B = Bd3; Dano3.C = C; Dano3.D = D;
 
 % Plotagem
 plot_modal_signature(res_luen_d3, res_kalman_d3, t, Tchirp, Fs, ...
-    'Cenário 3: Falha Mista (b=50%, k_2=50%)');
+    'Cenário 3: Dano Misto (b=50%, k_2=50%)');
