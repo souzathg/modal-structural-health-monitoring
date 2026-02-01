@@ -1,7 +1,7 @@
 %% Resposta em Frequência com Decomposição Modal (2 Saídas)
-% Autor: Gemini (Baseado no seu código)
+% Autor: Thiago Tioma
 % Descrição: Decompõe a resposta do sistema nos seus modos de vibração
-% (Modo 1 e Modo 2) e plota para ambas as saídas (y1 e y2).
+% (Modo 1 e Modo 2) e plota para ambas as saídas (y_1 e y_2).
 
 clear; clc; close all;
 
