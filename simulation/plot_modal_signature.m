@@ -5,7 +5,7 @@ function plot_modal_signature(residuo_luen, residuo_kalman, t, tfalha, Fs, titul
 %   [ Saída 1 - Luenberger ]   [ Saída 1 - Kalman ]
 %   [ Saída 2 - Luenberger ]   [ Saída 2 - Kalman ]
 %
-% Em cada subplot: Modo 1 (Azul) e Modo 2 (Vermelho/Laranja) sobrepostos.
+% Em cada subplot: Modo 1 (Azul) e Modo 2 (Vermelho) sobrepostos.
 
     % --- 1. Filtros ---
     Wn_low  = 4 / (Fs/2);      % Passa-Baixas (Modo 1)
@@ -15,11 +15,11 @@ function plot_modal_signature(residuo_luen, residuo_kalman, t, tfalha, Fs, titul
     [b_band, a_band] = butter(4, Wn_band, 'bandpass');
     
     figure('Name', titulo, 'Color', 'w', 'Position', [100, 100, 1200, 700]);
-    sgtitle(titulo, 'FontWeight', 'bold', 'FontSize', 12);
+    % sgtitle(titulo, 'FontWeight', 'bold', 'FontSize', 12);
     
     residuos = {residuo_luen, residuo_kalman};
     nomes_obs = {'Luenberger', 'Kalman'};
-    nomes_saida = {'Saída 1 (M. Não Suspensa)', 'Saída 2 (M. Suspensa)'};
+    nomes_saida = {'y_1', 'y_2'};
     
     % Loop para gerar os 4 gráficos
     plot_idx = 1;
@@ -39,24 +39,24 @@ function plot_modal_signature(residuo_luen, residuo_kalman, t, tfalha, Fs, titul
             ax = subplot(2, 2, plot_idx);
             hold on;
             
-            % Plot Modo 1 (Azul - Grosso)
-            h1 = plot(t, r_modo1, 'b', 'LineWidth', 1.2);
+            % Plot Modo 1 (Azul)
+            h1 = plot(t, r_modo1, 'b', 'LineWidth', 1);
             
-            % Plot Modo 2 (Laranja - Fino para destaque sobreposto)
-            h2 = plot(t, r_modo2, 'r--', 'LineWidth', 0.8);
+            % Plot Modo 2 (Vermelho - Pontos)
+            h2 = plot(t, r_modo2, 'r:', 'LineWidth', 1);
             
             % Linha de Falha
-            xline(tfalha, 'k:', 'LineWidth', 1.5);
+            xline(tfalha, 'k--', {'Dano'},'LineWidth', 1);
             
             % Decoração
-            title(sprintf('%s - %s', nomes_saida{i_saida}, nomes_obs{i_obs}));
-            grid on; axis tight;
+            title(sprintf('%s — %s', nomes_obs{i_obs}, nomes_saida{i_saida}));
+            grid minor; axis normal;
             if i_saida == 2; xlabel('Tempo (s)'); end
             if i_obs == 1; ylabel('Resíduo (m)'); end
             
             % Legenda apenas no primeiro gráfico para não poluir
             if plot_idx == 1
-                legend([h1, h2], 'Modo 1 (<4Hz)', 'Modo 2 (6-10Hz)', 'Location', 'best');
+                legend([h1, h2], 'Modo 1', 'Modo 2', 'Location', 'best');
             end
             
             axes_handles = [axes_handles, ax];
