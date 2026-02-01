@@ -36,8 +36,8 @@ L_luenberger = place(A', C', polos_desejados)';
 
 % --- Kalman ---
 fprintf('\n=== PROJETO KALMAN (MIMO) ===\n');
-q_proj = 1e-7; 
-Q_kalman = q_proj * eye(4); 
+q_proj = 1e-4; 
+Q_kalman = q_proj * eye(4);
 % R deve ser 2x2 (uma estimativa de ruído para cada sensor)
 R_kalman = 1e-4 * eye(2); 
 L_kalman = lqe(A, eye(4), C, Q_kalman, R_kalman);
