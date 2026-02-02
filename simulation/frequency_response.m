@@ -17,30 +17,20 @@ w_freq = logspace(-1, 2, 1000) * 2 * pi;
 f_hz = w_freq / (2*pi);
 
 %% 2. Construção do Modelo Original
-% Matrizes do espaço de estados
-A = [0, 1, 0, -1;
-    -k2/m2, -b/m2, 0, b/m2;
-    0, 0, 0, 1;
-    k2/m1, b/m1, -k1/m1, -b/m1];
-
-B = [0; 0; -1; 1/m1];
-
-% Saídas: Posição Massa Não Suspensa (x1) e Posição Massa Suspensa (x2)
-C = [1, 0, 0, 0; 
-     0, 1, 0, 0];
- 
-D = [0; 0];
+[A, B, C, D] = generate_model_thesis(m1, m2, k1, k2, b);
 
 sys_full = ss(A, B, C, D);
 
 %% 3. Decomposição Modal
 % Transforma o sistema para a forma canônica modal.
 % A matriz A_modal será diagonal em blocos 2x2 (para pares complexos).
-[sys_modal, T] = canon(sys_full, 'modal');
+[sys_modal, T] = modalreal(sys_full);
 
 A_m = sys_modal.A;
 B_m = sys_modal.B;
 C_m = sys_modal.C;
+
+damp(sys_modal)
 
 % Identificação dos Modos
 % O sistema tem 4 estados. Na forma modal, eles estão em pares (1-2 e 3-4).
@@ -94,24 +84,25 @@ y2_m2_db   = 20*log10(squeeze(mag_m2(2,1,:)));
 figure('Color', 'w', 'Position', [100, 100, 900, 700]);
 
 % --- Subplot 1: Massa Não Suspensa (x1) ---
-subplot(2,1,1); hold on; grid on;
-p1 = semilogx(f_hz, y1_full_db, 'k-', 'LineWidth', 1.5); % Sistema Completo
-p2 = semilogx(f_hz, y1_m1_db,   'b:', 'LineWidth', 1.8); % Modo 1
-p3 = semilogx(f_hz, y1_m2_db,   'r:', 'LineWidth', 1.8); % Modo 2
+subplot(2,1,1); hold on; grid minor;
+p1 = semilogx(f_hz, y1_full_db, 'k-', 'LineWidth', 1); % Sistema Completo
+p2 = semilogx(f_hz, y1_m1_db,   'b:', 'LineWidth', 1); % Modo 1
+p3 = semilogx(f_hz, y1_m2_db,   'r:', 'LineWidth', 1); % Modo 2
 
-title('Saída 1: Massa Não Suspensa (y_1)', 'FontSize', 12);
-ylabel('Magnitude (dB)');
-legend([p1, p2, p3], {'Sistema Completo', 'Modo 1 (Baixa Freq)', 'Modo 2 (Alta Freq)'}, 'Location', 'best');
-xlim([0.1 100]); ylim([-100 40]);
+title('Saída y_1 — Massa Não Suspensa (m_1)', 'FontSize', 11);
+ylabel('Magnitude (dB)', 'FontSize', 10);
+legend([p1, p2, p3], {'Sistema', 'Modo 1', 'Modo 2'}, 'Location', 'best');
+xlim([0.1 100]); ylim([-120 40]);
+xscale log
 
 % --- Subplot 2: Massa Suspensa (x2) ---
-subplot(2,1,2); hold on; grid on;
-semilogx(f_hz, y2_full_db, 'k-', 'LineWidth', 1.5);
-semilogx(f_hz, y2_m1_db,   'b:', 'LineWidth', 1.8);
-semilogx(f_hz, y2_m2_db,   'r:', 'LineWidth', 1.8);
+subplot(2,1,2); hold on; grid minor;
+semilogx(f_hz, y2_full_db, 'k-', 'LineWidth', 1);
+semilogx(f_hz, y2_m1_db,   'b:', 'LineWidth', 1);
+semilogx(f_hz, y2_m2_db,   'r:', 'LineWidth', 1);
 
-title('Saída 2: Massa Suspensa (y_2)', 'FontSize', 12);
-xlabel('Frequência (Hz)'); ylabel('Magnitude (dB)');
-xlim([0.1 100]); ylim([-100 40]);
+title('Saída y_2 — Massa Suspensa (m_2)', 'FontSize', 11);
+xlabel('Frequência (Hz)', 'FontSize', 10); ylabel('Magnitude (dB)', 'FontSize', 10);
+xlim([0.1 100]); ylim([-120 40]);
+xscale log
 
-sgtitle('Decomposição Modal da Resposta em Frequência', 'FontSize', 14, 'FontWeight', 'bold');
