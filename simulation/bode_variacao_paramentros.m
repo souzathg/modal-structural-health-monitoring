@@ -18,11 +18,6 @@ b_nom  = 7.5;   % Amortecimento NOMINAL [Ns/m]
 porcentagens = [1e-6, 0.1:0.1:1.0]; 
 num_vars = length(porcentagens);
 
-% Definição da Saída para o Bode (Posição das Massas)
-C_out = [1, 0, 0, 0;
-         0, 1, 0, 0];
-D_out = [0; 0];
-
 % Vetor de frequências (0.1 a 12 Hz conforme seu chirp)
 w_freq = linspace(0.1, 12, 500) * 2 * pi; 
 f_hz = w_freq / (2*pi);
@@ -30,11 +25,11 @@ f_hz = w_freq / (2*pi);
 %% --- FIGURA 1: Variação do Amortecimento (b) ---
 figure('Name', 'Sensibilidade - Amortecimento (b)', 'Color', 'w', 'Position', [100, 100, 1000, 800]);
 
-sgtitle('Resposta à variação do coef. de amortecimento (b)')
+% sgtitle('Resposta à variação do coef. de amortecimento (b)')
 
 % Prepara os eixos
-ax1 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)');
-ax2 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
+ax1 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=11, FontWeight='bold'); ylabel('Magnitude (dB)');
+ax2 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=11, FontWeight='bold'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
 
 % Cores para o gradiente
 cores = jet(num_vars);
@@ -47,7 +42,9 @@ for i = 1:num_vars
     k2_atual = k2_nom;     % k2 fixo no nominal
     
     % Monta o sistema
-    sys_curr = get_sys_ss(m1, m2, k1, k2_atual, b_atual, C_out, D_out);
+    [A, B, C, D] = generate_model(m1, m2, k1, k2_atual, b_atual);
+
+    sys_curr = ss(A, B, C, D);
     
     % Calcula a resposta em frequência (MIMO: 2 saídas, 1 entrada)
     [mag, ~] = bode(sys_curr, w_freq);
@@ -64,8 +61,8 @@ for i = 1:num_vars
     mag_db_x2 = 20*log10(mag_x2);
     
     % Plota nos subplots respectivos
-    plot(ax1, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1.2);
-    plot(ax2, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1.2);
+    plot(ax1, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1);
+    plot(ax2, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1);
 end
 
 % Ajustes Finais Figura 1
@@ -77,11 +74,11 @@ colormap(ax2, jet); % Apenas para manter consistência visual
 %% --- FIGURA 2: Variação da Rigidez (k2) ---
 figure('Name', 'Sensibilidade - Rigidez (k2)', 'Color', 'w', 'Position', [150, 100, 1000, 800]);
 
-sgtitle('Resposta à variação do coef. de rigidez (k_2)')
+% sgtitle('Resposta à variação do coef. de rigidez (k_2)')
 
 % Prepara os eixos
-ax3 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)');
-ax4 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=10, FontWeight='normal'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
+ax3 = subplot(2,1,1); hold on; grid on; title('Saída 1 — Massa Não-Suspensa (y_1)', FontSize=11, FontWeight='bold'); ylabel('Magnitude (dB)');
+ax4 = subplot(2,1,2); hold on; grid on; title('Saída 2 — Massa Suspensa (y_2)', FontSize=11, FontWeight='bold'); ylabel('Magnitude (dB)'); xlabel('Frequência (Hz)');
 
 for i = 1:num_vars
     pct = porcentagens(i);
@@ -90,9 +87,10 @@ for i = 1:num_vars
     b_atual = b_nom;      % b fixo no nominal
     k2_atual = k2_nom * pct;
     
-    % Monta o sistema
-    sys_curr = get_sys_ss(m1, m2, k1, k2_atual, b_atual, C_out, D_out);
-    
+    [A, B, C, D] = generate_model(m1, m2, k1, k2_atual, b_atual);
+
+    sys_curr = ss(A, B, C, D);
+
     % Calcula Bode
     [mag, ~] = bode(sys_curr, w_freq);
     
@@ -101,8 +99,8 @@ for i = 1:num_vars
     mag_db_x2 = 20*log10(squeeze(mag(2, 1, :)));
     
     % Plota
-    plot(ax3, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1.2);
-    plot(ax4, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1.2);
+    plot(ax3, f_hz, mag_db_x1, 'Color', cores(i,:), 'LineWidth', 1);
+    plot(ax4, f_hz, mag_db_x2, 'Color', cores(i,:), 'LineWidth', 1);
 end
 
 % Ajustes Finais Figura 2
