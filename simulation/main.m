@@ -11,7 +11,7 @@ k2_nom = 900;   % Rigidez da suspensão [N/m]
 b_nom  = 7.5;   % Amortecimento [Ns/m]
 
 % Gera o modelo original
-[A, B, C, D] = generate_model_thesis(m1, m2, k1, k2_nom, b_nom);
+[A, B, C, D] = generate_model(m1, m2, k1, k2_nom, b_nom);
 
 Nominal.A = A; Nominal.B = B; Nominal.C = C; Nominal.D = D;
 
@@ -41,6 +41,18 @@ Q_kalman = q_proj * eye(4);
 % R deve ser 2x2 (uma estimativa de ruído para cada sensor)
 R_kalman = 1e-4 * eye(2); 
 L_kalman = lqe(A, eye(4), C, Q_kalman, R_kalman);
+
+%% ---------------------------------------------------------
+%% CENÁRIO 0: Sem danos
+%% ---------------------------------------------------------
+fprintf('\n--- Simulando Cenário 0: Sem danos ---\n');
+
+% Simulações
+[res_luen_d0, ~] = run_observer_sim_noisy(Nominal, Nominal, L_luenberger, t, w_in, Tchirp);
+[res_kalman_d0, ~] = run_observer_sim_noisy(Nominal, Nominal, L_kalman, t, w_in, Tchirp);
+
+% Plotagem
+plot_modal_signature(res_luen_d0, res_kalman_d0, t, Tchirp, Fs, 'Cenário 0: Sem danos');
 
 %% ---------------------------------------------------------
 %% CENÁRIO 1: Dano no Amortecedor (b = 50%)
