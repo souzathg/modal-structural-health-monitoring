@@ -11,7 +11,7 @@ k2_nom = 900;   % Rigidez da suspensão [N/m]
 b_nom  = 7.5;   % Amortecimento [Ns/m]
 
 % Gera o modelo original
-[A, B, C, D] = generate_model(m1, m2, k1, k2_nom, b_nom);
+[A, B, C, D] = generate_model_thesis(m1, m2, k1, k2_nom, b_nom);
 
 Nominal.A = A; Nominal.B = B; Nominal.C = C; Nominal.D = D;
 
